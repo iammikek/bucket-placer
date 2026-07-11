@@ -2,6 +2,8 @@
 
 Daihatsu Copen **JB-DET** cam-bucket catalog and clearance-based placement.
 
+![Bucket Placer overview: OHC clearance stack, Daihatsu formula, and selecting the best 16 from a pool of 32](docs/bucket-placer-overview.svg)
+
 Worn shimless lifters no longer match their side stamps. This project records measured centre thickness, then assigns the best 16 buckets from a pool of up to 32 against cold intake/exhaust clearance targets.
 
 ## Cold valve clearance (JB-DET)
