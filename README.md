@@ -4,7 +4,35 @@ Daihatsu Copen **JB-DET** cam-bucket catalog and clearance-based placement.
 
 ![Bucket Placer overview: OHC clearance stack, Daihatsu formula, and selecting the best 16 from a pool of 32](docs/bucket-placer-overview.svg)
 
-Worn shimless lifters no longer match their side stamps. This project records measured centre thickness, then assigns the best 16 buckets from a pool of up to 32 against cold intake/exhaust clearance targets.
+## Why this exists
+
+The first-generation Daihatsu Copen (L880) and its **JB-DET** kei engine are long out of production. Replacement shimless valve lifters (cam buckets) in specific thicknesses are hard or impossible to buy new in useful sizes. When rebuilding a head, you cannot simply order a fresh set and walk away.
+
+This project exists to **reuse what you have**: measure a pool of used buckets accurately, ignore the misleading side stamps, then pick and place the best 16 against real cold clearances. It is a scrap-yard and spare-engine problem turned into a small engineering workflow, because the supply chain for an obsolete car no longer covers the valvetrain.
+
+Two full sets (32 buckets) from a pair of engines, one of which had a head gasket failure, are the working stock.
+
+## How wear happens
+
+Each bucket sits between a cam lobe and a valve stem tip. Over time the lobe polishes a dish into the cam face:
+
+1. **Early wear** is concentrated in the centre. A flat micrometer anvil bridges the dish and sits on the high rim, so the reading looks thicker than the true centre.
+2. **Later wear** can take the whole face down, so rim and centre converge. Exhaust valves run hotter and often wear faster, which is why exhaust clearance targets are larger and why thin buckets tend to cluster on that side.
+3. **Heat and oil problems** (for example after a head gasket failure) can accelerate face wipe across the pad, not just a neat centre dish.
+
+The side stamp is the factory thickness code. Once the face has worn, that number is historical. Placement must use **measured centre thickness**, not the stamp.
+
+### Why the pin guide matters
+
+A flat micrometer alone is the wrong tool once the face is dished: the anvils sit on the rim and overstate thickness. The printed sleeve (`bucket-measure-sleeve.scad`) drops into the bucket bore and holds an M3 hex bolt of known length (tip to top of head = **18.83 mm**) so the tip finds the centre of the pad. Micrometer reading minus pin length is the centre thickness used for placement.
+
+Without that, the catalogue would repeat the rim bias we saw on set 1 (many buckets looking ~3.4 mm on the rim while the centre sat near ~3.0 mm). The sleeve is a cheap fixture so every bucket is measured the same way.
+
+Lapping or recutting valve seats recesses the valve into the head and **tightens** clearance. That often makes thinner worn buckets useful again after a valve job, instead of demanding thick new parts you cannot buy.
+
+## What the tool does
+
+Records measured centre thickness for each bucket, then assigns the best 16 from a pool of up to 32 against cold intake/exhaust clearance targets.
 
 ## Cold valve clearance (JB-DET)
 
