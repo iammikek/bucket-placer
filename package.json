@@ -5,6 +5,7 @@
   "description": "Daihatsu Copen JB-DET cam bucket catalog and clearance-based placement",
   "type": "module",
   "scripts": {
+    "report:buckets": "node --experimental-strip-types ./report-buckets.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },

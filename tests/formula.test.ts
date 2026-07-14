@@ -1,10 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
+  factoryThicknessMm,
   MEASURE_PIN_LENGTH_MM,
   VALVE_CLEARANCE_COLD_MM,
   centreThicknessMm,
   nominalFromStamp,
   thicknessFromReading,
+  wearFromBucket,
   type CamBucket,
 } from "../cam-buckets";
 import {
@@ -25,18 +27,40 @@ describe("stamp and pin sizing", () => {
   });
 
   it("derives centre thickness from pin reading", () => {
-    expect(thicknessFromReading(21.88)).toBeCloseTo(3.05, 5);
-    expect(MEASURE_PIN_LENGTH_MM).toBe(18.83);
+    expect(thicknessFromReading(21.88)).toBeCloseTo(2.98, 5);
+    expect(MEASURE_PIN_LENGTH_MM).toBe(18.9);
 
     const bucket: CamBucket = {
       id: "B",
       stamped: 24,
-      measuredMm: 3.02,
       pinReadingMm: 21.88,
+      factoryMm: 3.44,
     };
-    expect(centreThicknessMm(bucket)).toBeCloseTo(3.05, 5);
+    expect(centreThicknessMm(bucket)).toBeCloseTo(2.98, 5);
     expect(
       centreThicknessMm({ ...bucket, pinReadingMm: null }),
+    ).toBeNull();
+  });
+
+  it("derives factory thickness and wear from a bucket", () => {
+    const bucket: CamBucket = {
+      id: "E",
+      stamped: 18,
+      pinReadingMm: 21.72,
+      factoryMm: 3.38,
+    };
+
+    expect(factoryThicknessMm(bucket)).toBeCloseTo(3.38, 5);
+    expect(wearFromBucket(bucket)).toBeCloseTo(0.56, 5);
+
+    expect(
+      factoryThicknessMm({ ...bucket, factoryMm: null }),
+    ).toBeCloseTo(3.38, 5);
+    expect(
+      wearFromBucket({ ...bucket, factoryMm: null }),
+    ).toBeCloseTo(0.56, 5);
+    expect(
+      wearFromBucket({ ...bucket, stamped: null, factoryMm: null }),
     ).toBeNull();
   });
 });
@@ -88,8 +112,8 @@ describe("selectBestSixteen", () => {
       set,
       id,
       stamped: null,
-      measuredMm: centreMm,
       pinReadingMm: centreMm + MEASURE_PIN_LENGTH_MM,
+      factoryMm: null,
     };
   }
 
