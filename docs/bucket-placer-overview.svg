@@ -39,7 +39,7 @@
     <text x="16" y="132" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#64748b">Too loose = thicker bucket</text>
 
     <text x="0" y="180" font-family="system-ui,Segoe UI,sans-serif" font-size="15" font-weight="700" fill="#2d7a71" letter-spacing="0.08em">MEASURE</text>
-    <text x="0" y="208" font-family="system-ui,Segoe UI,sans-serif" font-size="13" fill="#334155">Centre = pin reading - 18.83 mm</text>
+    <text x="0" y="208" font-family="system-ui,Segoe UI,sans-serif" font-size="13" fill="#334155">Centre = pin reading - 10.00 mm</text>
     <text x="0" y="230" font-family="system-ui,Segoe UI,sans-serif" font-size="13" fill="#64748b">Printed sleeve + M3 pin finds the</text>
     <text x="0" y="250" font-family="system-ui,Segoe UI,sans-serif" font-size="13" fill="#64748b">worn dish, not the high rim.</text>
   </g>

@@ -32,7 +32,8 @@ const rows: ReportRow[] = allCamBuckets
     wearMm: wearFromBucket(bucket),
   }))
   .sort((a, b) => {
-    const wearDiff = (b.wearMm ?? -Infinity) - (a.wearMm ?? -Infinity);
+    // Most negative (thinnest vs stamp) first
+    const wearDiff = (a.wearMm ?? Infinity) - (b.wearMm ?? Infinity);
     if (Math.abs(wearDiff) > 1e-9) return wearDiff;
     if (a.set !== b.set) return a.set - b.set;
     return a.id.localeCompare(b.id);

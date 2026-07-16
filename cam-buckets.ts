@@ -19,7 +19,7 @@
  *   Code 18 → 2.840 mm
  *   nominalMm = 2.48 + stamped * 0.02
  *
- * Measuring pin (M3 in printed sleeve): thickness = pinReadingMm − 18.87
+ * Measuring pin (rebuilt sleeve): thickness = pinReadingMm − 10.00
  */
 
 export type CamBucket = {
@@ -64,10 +64,10 @@ export const VALVE_CLEARANCE_COLD_MM = {
 } as const;
 
 /**
- * Measuring pin (M3 hex bolt in printed sleeve).
+ * Measuring pin (rebuilt sleeve / known length).
  * Thickness = micrometer reading − pin length.
  */
-export const MEASURE_PIN_LENGTH_MM = 18.87;
+export const MEASURE_PIN_LENGTH_MM = 10;
 
 /** Centre thickness from a pin-assisted micrometer reading. */
 export function thicknessFromReading(readingMm: number): number {
@@ -82,7 +82,10 @@ export function centreThicknessMm(
   return thicknessFromReading(bucket.pinReadingMm);
 }
 
-/** Material worn from factory nominal thickness, or null if unknown. */
+/**
+ * Thickness vs factory stamp (mm), or null if unknown.
+ * Negative = thinner than stamp (worn); positive = thicker than stamp.
+ */
 export function wearFromBucket(
   bucket: Pick<CamBucket, "stamped" | "pinReadingMm">,
 ): number | null {
@@ -90,56 +93,53 @@ export function wearFromBucket(
   if (measured == null) return null;
   const factory = factoryThicknessMm(bucket);
   if (factory == null) return null;
-  return +(factory - measured).toFixed(2);
+  return +(measured - factory).toFixed(2);
 }
 
-/** Fresh catalogue — letter + stamp first, then rim / pin readings.
- *  One continuous ID pool: A–Z then AA–AF (32).
- *  A–P = leftovers from both original engines.
- *  Q–AF = buckets fitted for the original head rebuild. */
+/** Full catalogue with 10 mm pin centre readings (A–AF). */
 export const camBucketSets: CamBucketSet[] = [
   {
     set: 1,
-    note: "Leftovers from both original engines (stamps; rim / pin pending)",
+    note: "Leftovers from both original engines (10 mm pin measured)",
     buckets: [
-      { id: "A", stamped: 19, pinReadingMm: 21.77 },
-      { id: "B", stamped: 23, pinReadingMm: 21.82 },
-      { id: "C", stamped: 23, pinReadingMm: 21.86 },
-      { id: "D", stamped: 23, pinReadingMm: 21.84 },
-      { id: "E", stamped: 18, pinReadingMm: 21.72 },
-      { id: "F", stamped: 22, pinReadingMm: 21.81 },
-      { id: "G", stamped: 20, pinReadingMm: 21.76 },
-      { id: "H", stamped: 21, pinReadingMm: 21.78 },
-      { id: "I", stamped: 23, pinReadingMm: 21.84 },
-      { id: "J", stamped: 18, pinReadingMm: 21.73, note: "corroded" },
-      { id: "K", stamped: 18, pinReadingMm: 21.75 },
-      { id: "L", stamped: 22, pinReadingMm: 21.82 },
-      { id: "M", stamped: 24, pinReadingMm: 21.87 },
-      { id: "N", stamped: 20, pinReadingMm: 21.78 },
-      { id: "O", stamped: 25, pinReadingMm: 21.89 },
-      { id: "P", stamped: 20, pinReadingMm: 21.77 },
+      { id: "A", stamped: 19, pinReadingMm: 12.85 },
+      { id: "B", stamped: 23, pinReadingMm: 12.94 },
+      { id: "C", stamped: 23, pinReadingMm: 12.92 },
+      { id: "D", stamped: 23, pinReadingMm: 12.93 },
+      { id: "E", stamped: 18, pinReadingMm: 12.84 },
+      { id: "F", stamped: 22, pinReadingMm: 12.92 },
+      { id: "G", stamped: 20, pinReadingMm: 12.89 },
+      { id: "H", stamped: 21, pinReadingMm: 12.91 },
+      { id: "I", stamped: 23, pinReadingMm: 12.95 },
+      { id: "J", stamped: 18, pinReadingMm: 12.86, note: "corroded" },
+      { id: "K", stamped: 18, pinReadingMm: 12.85 },
+      { id: "L", stamped: 22, pinReadingMm: 12.93 },
+      { id: "M", stamped: 24, pinReadingMm: 12.97 },
+      { id: "N", stamped: 20, pinReadingMm: 12.88 },
+      { id: "O", stamped: 25, pinReadingMm: 12.98 },
+      { id: "P", stamped: 20, pinReadingMm: 12.89 },
     ],
   },
   {
     set: 2,
-    note: "From original head rebuild (stamps; rim / pin pending)",
+    note: "From original head rebuild (10 mm pin measured)",
     buckets: [
-      { id: "Q", stamped: 15, pinReadingMm: 21.67 },
-      { id: "R", stamped: 16, pinReadingMm: 21.69 },
-      { id: "S", stamped: 15, pinReadingMm: 21.68 },
-      { id: "T", stamped: 17, pinReadingMm: 21.73 },
-      { id: "U", stamped: 18, pinReadingMm: 21.70 },
-      { id: "V", stamped: 13, pinReadingMm: 21.64 },
-      { id: "W", stamped: 18, pinReadingMm: 21.73 },
-      { id: "X", stamped: 17, pinReadingMm: 21.72 },
-      { id: "Y", stamped: 14, pinReadingMm: 21.63 },
-      { id: "Z", stamped: 17, pinReadingMm: 21.68 },
-      { id: "AA", stamped: 14, pinReadingMm: 21.64 },
-      { id: "AB", stamped: 15, pinReadingMm: 21.66 },
-      { id: "AC", stamped: 18, pinReadingMm: 21.74 },
-      { id: "AD", stamped: 16, pinReadingMm: 21.71 },
-      { id: "AE", stamped: 18, pinReadingMm: 21.73 },
-      { id: "AF", stamped: 13, pinReadingMm: 21.64 },
+      { id: "Q", stamped: 15, pinReadingMm: 12.79 },
+      { id: "R", stamped: 16, pinReadingMm: 12.81 },
+      { id: "S", stamped: 15, pinReadingMm: 12.79 },
+      { id: "T", stamped: 17, pinReadingMm: 12.83 },
+      { id: "U", stamped: 18, pinReadingMm: 12.84 },
+      { id: "V", stamped: 13, pinReadingMm: 12.75 },
+      { id: "W", stamped: 18, pinReadingMm: 12.85 },
+      { id: "X", stamped: 17, pinReadingMm: 12.83 },
+      { id: "Y", stamped: 14, pinReadingMm: 12.76 },
+      { id: "Z", stamped: 17, pinReadingMm: 12.81 },
+      { id: "AA", stamped: 14, pinReadingMm: 12.77 },
+      { id: "AB", stamped: 15, pinReadingMm: 12.79 },
+      { id: "AC", stamped: 16, pinReadingMm: 12.81 },
+      { id: "AD", stamped: 18, pinReadingMm: 12.84 },
+      { id: "AE", stamped: 18, pinReadingMm: 12.85 },
+      { id: "AF", stamped: 13, pinReadingMm: 12.75 },
     ],
   },
 ];

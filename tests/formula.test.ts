@@ -27,13 +27,13 @@ describe("stamp and pin sizing", () => {
   });
 
   it("derives centre thickness from pin reading", () => {
-    expect(thicknessFromReading(21.88)).toBeCloseTo(2.98, 5);
-    expect(MEASURE_PIN_LENGTH_MM).toBe(18.87);
+    expect(thicknessFromReading(12.98)).toBeCloseTo(2.98, 5);
+    expect(MEASURE_PIN_LENGTH_MM).toBe(10);
 
     const bucket: CamBucket = {
       id: "B",
       stamped: 24,
-      pinReadingMm: 21.88,
+      pinReadingMm: 12.98,
     };
     expect(centreThicknessMm(bucket)).toBeCloseTo(2.98, 5);
     expect(
@@ -45,7 +45,7 @@ describe("stamp and pin sizing", () => {
     const bucket: CamBucket = {
       id: "E",
       stamped: 18,
-      pinReadingMm: 21.72,
+      pinReadingMm: 12.83, // centre 2.83 vs stamp 2.84
     };
 
     expect(factoryThicknessMm(bucket)).toBeCloseTo(2.84, 5);

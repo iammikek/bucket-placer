@@ -24,7 +24,7 @@ The side stamp is the factory thickness code. Once the face has worn, that numbe
 
 ### Why the pin guide matters
 
-A flat micrometer alone is the wrong tool once the face is dished: the anvils sit on the rim and overstate thickness. The printed sleeve (`bucket-measure-sleeve.scad`) drops into the bucket bore and holds an M3 hex bolt of known length (tip to top of head = **18.87 mm**) so the tip finds the centre of the pad. Micrometer reading minus pin length is the centre thickness used for placement.
+A flat micrometer alone is the wrong tool once the face is dished: the anvils sit on the rim and overstate thickness. The measuring sleeve (`bucket-measure-sleeve.scad`) drops into the bucket bore and holds a pin of known length (**10.00 mm**) so the tip finds the centre of the pad. Micrometer reading minus pin length is the centre thickness used for placement.
 
 Without that, the catalogue would repeat the rim bias we saw on set 1 (many buckets looking ~3.4 mm on the rim while the centre sat near ~3.0 mm). The sleeve is a cheap fixture so every bucket is measured the same way.
 
@@ -53,8 +53,8 @@ new thickness = installed thickness + (measured clearance − specified clearanc
 ## Workflow
 
 1. Catalog buckets (stamp, rim reading, pin reading) in `cam-buckets.ts`
-2. Print the measuring sleeve from `bucket-measure-sleeve.scad` (pin length **18.87 mm**)
-3. Centre thickness = pin reading − 18.87
+2. Print / rebuild the measuring sleeve from `bucket-measure-sleeve.scad` (pin length **10.00 mm**)
+3. Centre thickness = pin reading − 10.00
 4. Install any 16, fit cams, measure cold gaps — note `set:letter` per port (`1:A`, `2:C`, …)
 5. Run `selectBestSixteen()` to place the best 16 from the full pool; leftovers are spares
 

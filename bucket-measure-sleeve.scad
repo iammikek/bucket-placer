@@ -15,8 +15,8 @@
 //   3. If fit="tap", run an M3 tap through the bore.
 //   4. Push sleeve into the bucket; friction-push or screw the bolt tip-down.
 //   5. Micrometer: anvil on cam face, spindle on bolt head.
-//        bucket_thickness = reading - 18.83
-//   Measured pin length (tip → top of hex): 18.83 mm
+//        bucket_thickness = reading - 10.00
+//   Measured pin length: 10.00 mm
 
 /* [Bucket] */
 bucket_od = 23.5;          // measured
@@ -29,7 +29,7 @@ bolt_nominal = 16;         // [6, 8, 10, 12, 16, 18, 20] — longer = deeper sle
 bolt_shank_d = 3.0;
 bolt_head_af = 5.5;
 bolt_head_height = 3.1;    // approx; actual tip→top measured below
-bolt_measured_length = 18.83; // tip → top of hex (use this when subtracting)
+bolt_measured_length = 10.00; // use this when subtracting from micrometer reading
 // Extra room around the hex so the micrometer anvil can reach the head
 head_pocket_clearance = 2.5;
 // How deep the wide head pocket is cut into the top (mm)
