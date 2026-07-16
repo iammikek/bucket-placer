@@ -49,9 +49,9 @@ console.log("Cam Bucket Report");
 console.log("=================");
 console.log(`Buckets: ${rows.length}`);
 console.log(`Measured: ${rows.filter((row) => row.measuredMm != null).length}`);
-console.log(`Average wear: ${formatMm(avgWearMm)} mm`);
-console.log(`Most wear: ${formatMm(maxWearMm)} mm`);
-console.log(`Least wear: ${formatMm(minWearMm)} mm`);
+console.log(`Average delta from nominal: ${formatMm(avgWearMm)} mm`);
+console.log(`Closest to nominal: ${formatMm(maxWearMm)} mm`);
+console.log(`Most below nominal: ${formatMm(minWearMm)} mm`);
 console.log("");
 
 console.table(

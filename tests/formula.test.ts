@@ -19,22 +19,21 @@ import {
 } from "../assign-buckets";
 
 describe("stamp and pin sizing", () => {
-  it("maps stamp codes as hundredths over 3.20 mm", () => {
-    expect(nominalFromStamp(0)).toBeCloseTo(3.2, 5);
-    expect(nominalFromStamp(2)).toBeCloseTo(3.22, 5);
-    expect(nominalFromStamp(18)).toBeCloseTo(3.38, 5);
-    expect(nominalFromStamp(24)).toBeCloseTo(3.44, 5);
+  it("maps stamp codes using 0.020 mm table steps", () => {
+    expect(nominalFromStamp(1)).toBeCloseTo(2.5, 5);
+    expect(nominalFromStamp(2)).toBeCloseTo(2.52, 5);
+    expect(nominalFromStamp(18)).toBeCloseTo(2.84, 5);
+    expect(nominalFromStamp(24)).toBeCloseTo(2.96, 5);
   });
 
   it("derives centre thickness from pin reading", () => {
     expect(thicknessFromReading(21.88)).toBeCloseTo(2.98, 5);
-    expect(MEASURE_PIN_LENGTH_MM).toBe(18.9);
+    expect(MEASURE_PIN_LENGTH_MM).toBe(18.87);
 
     const bucket: CamBucket = {
       id: "B",
       stamped: 24,
       pinReadingMm: 21.88,
-      factoryMm: 3.44,
     };
     expect(centreThicknessMm(bucket)).toBeCloseTo(2.98, 5);
     expect(
@@ -47,20 +46,19 @@ describe("stamp and pin sizing", () => {
       id: "E",
       stamped: 18,
       pinReadingMm: 21.72,
-      factoryMm: 3.38,
     };
 
-    expect(factoryThicknessMm(bucket)).toBeCloseTo(3.38, 5);
-    expect(wearFromBucket(bucket)).toBeCloseTo(0.56, 5);
+    expect(factoryThicknessMm(bucket)).toBeCloseTo(2.84, 5);
+    expect(wearFromBucket(bucket)).toBeCloseTo(-0.01, 5);
 
     expect(
-      factoryThicknessMm({ ...bucket, factoryMm: null }),
-    ).toBeCloseTo(3.38, 5);
+      factoryThicknessMm({ ...bucket }),
+    ).toBeCloseTo(2.84, 5);
     expect(
-      wearFromBucket({ ...bucket, factoryMm: null }),
-    ).toBeCloseTo(0.56, 5);
+      wearFromBucket({ ...bucket }),
+    ).toBeCloseTo(-0.01, 5);
     expect(
-      wearFromBucket({ ...bucket, stamped: null, factoryMm: null }),
+      wearFromBucket({ ...bucket, stamped: null }),
     ).toBeNull();
   });
 });
@@ -113,7 +111,6 @@ describe("selectBestSixteen", () => {
       id,
       stamped: null,
       pinReadingMm: centreMm + MEASURE_PIN_LENGTH_MM,
-      factoryMm: null,
     };
   }
 
