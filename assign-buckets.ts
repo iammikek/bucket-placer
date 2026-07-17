@@ -1,20 +1,19 @@
 /**
- * Assign cam buckets to JB-DET valve ports from a pool of up to 32
- * (2 full sets).
+ * Assign cam buckets to JB-DET valve ports from a single pool of up to 32.
  *
  * Workflow:
- *   1. Install any 16 from the pool — note key per port ("1:A", "2:C", …).
+ *   1. Install any 16 from the pool — note id per port ("A", "Q", …).
  *   2. Fit cams, measure cold clearance at each port.
  *   3. required = installedCentre + (gap − target)
  *      IN target 0.20 · EX target 0.30
  *   4. selectBestSixteen() picks the best 16 out of all pin-measured stock
- *      (up to 32) and places them; the other 16 stay as spares.
+ *      and places them; the rest stay as spares.
  */
 
 import {
   CamBucket,
   VALVE_CLEARANCE_COLD_MM,
-  camBucketSets,
+  camBuckets,
   centreThicknessMm,
 } from "./cam-buckets";
 
@@ -26,23 +25,22 @@ export type ValvePort = {
   valve: 1 | 2;
 };
 
-/** Bucket with owning set — unique across the 32. */
-export type CatalogBucket = CamBucket & { set: number };
+/** Bucket in the placement pool (same shape as catalog). */
+export type CatalogBucket = CamBucket;
 
-/** "1:A" / "2:P" — unique id across both sets. */
-export function bucketKey(set: number, id: string): string {
-  return `${set}:${id}`;
+/** Pool key is the letter id (A–AF). */
+export function bucketKey(id: string): string {
+  return id;
 }
 
-export function parseBucketKey(key: string): { set: number; id: string } {
-  const [setStr, id] = key.split(":");
-  const set = Number(setStr);
-  if (!set || !id) throw new Error(`Bad bucket key "${key}" (expected "1:A")`);
-  return { set, id };
+export function parseBucketKey(key: string): { id: string } {
+  const id = key.includes(":") ? key.split(":")[1] : key;
+  if (!id) throw new Error(`Bad bucket key "${key}" (expected "A" or "AA")`);
+  return { id };
 }
 
 export type PortGapReading = ValvePort & {
-  /** e.g. "1:G" — whatever is in the port for the gap pass */
+  /** e.g. "G" — whatever is in the port for the gap pass */
   installedBucketKey: string;
   measuredClearanceMm: number;
 };
@@ -64,7 +62,7 @@ export type BucketAssignment = ValvePort & {
 
 export type AssignmentPlan = {
   assignments: BucketAssignment[];
-  /** Not chosen for the head — keep as spares / set 2 leftovers */
+  /** Not chosen for the head — keep as spares */
   spares: CatalogBucket[];
   summary: {
     ports: number;
@@ -105,13 +103,9 @@ export function requiredThicknessMm(
   return installedThicknessMm + (measuredClearanceMm - targetClearanceMm(side));
 }
 
-/** Every pin-measured bucket across both sets (unique keys). */
+/** Every pin-measured bucket in the pool. */
 export function catalogPool(): CatalogBucket[] {
-  return camBucketSets.flatMap((s) =>
-    s.buckets
-      .filter((b) => centreThicknessMm(b) != null)
-      .map((b) => ({ ...b, set: s.set })),
-  );
+  return camBuckets.filter((b) => centreThicknessMm(b) != null);
 }
 
 type SizedBucket = CatalogBucket & { thicknessMm: number; key: string };
@@ -119,18 +113,16 @@ type SizedBucket = CatalogBucket & { thicknessMm: number; key: string };
 function sizeBucket(b: CatalogBucket): SizedBucket | null {
   const t = centreThicknessMm(b);
   if (t == null) return null;
-  return { ...b, thicknessMm: t, key: bucketKey(b.set, b.id) };
+  return { ...b, thicknessMm: t, key: bucketKey(b.id) };
 }
 
 function sizedPool(buckets: CatalogBucket[]): SizedBucket[] {
   return buckets.map(sizeBucket).filter((b): b is SizedBucket => b != null);
 }
 
-function findSized(
-  pool: SizedBucket[],
-  key: string,
-): SizedBucket {
-  const b = pool.find((x) => x.key === key);
+function findSized(pool: SizedBucket[], key: string): SizedBucket {
+  const id = parseBucketKey(key).id;
+  const b = pool.find((x) => x.key === id || x.id === id);
   if (!b) throw new Error(`Unknown or unmeasured bucket "${key}"`);
   return b;
 }
@@ -149,8 +141,8 @@ function inSpec(clearance: number, side: ValveSide): boolean {
 }
 
 /**
- * Choose the best 16 buckets from the pool (typically up to 32) and place
- * them on the ports from a cam-gap pass. IN uses 0.20 target, EX 0.30.
+ * Choose the best 16 buckets from the pool and place them on the ports
+ * from a cam-gap pass. IN uses 0.20 target, EX 0.30.
  */
 export function selectBestSixteen(
   readings: PortGapReading[],

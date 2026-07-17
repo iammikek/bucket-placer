@@ -101,38 +101,33 @@ describe("Daihatsu clearance formula", () => {
 });
 
 describe("selectBestSixteen", () => {
-  function bucket(
-    set: number,
-    id: string,
-    centreMm: number,
-  ): CatalogBucket {
+  function bucket(id: string, centreMm: number): CatalogBucket {
     return {
-      set,
       id,
       stamped: null,
       pinReadingMm: centreMm + MEASURE_PIN_LENGTH_MM,
     };
   }
 
-  it("picks the closest of 32 for each port using IN/EX targets", () => {
+  it("picks the closest of the pool for each port using IN/EX targets", () => {
     const pool: CatalogBucket[] = [
-      bucket(1, "A", 3.0),
-      bucket(1, "B", 3.02),
-      bucket(1, "C", 3.04),
-      bucket(1, "D", 3.06),
-      bucket(2, "A", 2.96),
-      bucket(2, "B", 2.98),
-      bucket(2, "C", 3.08),
-      bucket(2, "D", 3.1),
+      bucket("A", 3.0),
+      bucket("B", 3.02),
+      bucket("C", 3.04),
+      bucket("D", 3.06),
+      bucket("E", 2.96),
+      bucket("F", 2.98),
+      bucket("G", 3.08),
+      bucket("H", 3.1),
     ];
 
-    // Trial: 1:A (3.00) in both ports
+    // Trial: A (3.00) in both ports
     const readings: PortGapReading[] = [
       {
         cylinder: 1,
         side: "intake",
         valve: 1,
-        installedBucketKey: "1:A",
+        installedBucketKey: "A",
         // clearance 0.28 with 3.00 → required 3.08
         measuredClearanceMm: 0.28,
       },
@@ -140,7 +135,7 @@ describe("selectBestSixteen", () => {
         cylinder: 1,
         side: "exhaust",
         valve: 1,
-        installedBucketKey: "1:A",
+        installedBucketKey: "A",
         // clearance 0.26 with 3.00 → required 2.96
         measuredClearanceMm: 0.26,
       },
@@ -156,20 +151,20 @@ describe("selectBestSixteen", () => {
     const exhaust = plan.assignments.find((a) => a.label === "1-EX-1");
 
     expect(intake?.requiredThicknessMm).toBeCloseTo(3.08, 5);
-    expect(intake?.bucketKey).toBe("2:C"); // 3.08 exact
+    expect(intake?.bucketKey).toBe("G"); // 3.08 exact
     expect(intake?.predictedClearanceMm).toBeCloseTo(0.2, 5);
     expect(intake?.inSpec).toBe(true);
 
     expect(exhaust?.requiredThicknessMm).toBeCloseTo(2.96, 5);
-    expect(exhaust?.bucketKey).toBe("2:A"); // 2.96 exact
+    expect(exhaust?.bucketKey).toBe("E"); // 2.96 exact
     expect(exhaust?.predictedClearanceMm).toBeCloseTo(0.3, 5);
     expect(exhaust?.inSpec).toBe(true);
 
     expect(new Set(plan.assignments.map((a) => a.bucketKey)).size).toBe(2);
   });
 
-  it("builds stable bucket keys across sets", () => {
-    expect(bucketKey(1, "A")).toBe("1:A");
-    expect(bucketKey(2, "P")).toBe("2:P");
+  it("builds stable bucket keys from letter ids", () => {
+    expect(bucketKey("A")).toBe("A");
+    expect(bucketKey("AF")).toBe("AF");
   });
 });

@@ -5,12 +5,21 @@
   "description": "Daihatsu Copen JB-DET cam bucket catalog and clearance-based placement",
   "type": "module",
   "scripts": {
+    "dev": "vite",
+    "build": "vite build",
+    "preview": "vite preview",
     "report:buckets": "node --experimental-strip-types ./report-buckets.ts",
     "test": "vitest run",
     "test:watch": "vitest"
   },
   "devDependencies": {
+    "@types/react": "^19.2.17",
+    "@types/react-dom": "^19.2.3",
+    "@vitejs/plugin-react": "^4.7.0",
+    "react": "^19.2.7",
+    "react-dom": "^19.2.7",
     "typescript": "^5.8.3",
+    "vite": "^6.4.3",
     "vitest": "^3.2.4"
   }
 }

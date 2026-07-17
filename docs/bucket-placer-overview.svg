@@ -50,7 +50,7 @@
 
     <rect x="0" y="24" width="220" height="100" rx="4" fill="#ffffff" stroke="#cbd5e1" stroke-width="1.5"/>
     <text x="14" y="52" font-family="system-ui,Segoe UI,sans-serif" font-size="13" font-weight="600" fill="#334155">Pool of 32</text>
-    <text x="14" y="74" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#64748b">2 sets, pin-measured</text>
+    <text x="14" y="74" font-family="system-ui,Segoe UI,sans-serif" font-size="12" fill="#64748b">single pool, pin-measured</text>
     <g fill="#4fa49a" opacity="0.85">
       <rect x="14" y="90" width="10" height="14" rx="1"/>
       <rect x="28" y="90" width="10" height="14" rx="1"/>

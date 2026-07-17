@@ -10,7 +10,7 @@ The first-generation Daihatsu Copen (L880) and its **JB-DET** kei engine are lon
 
 This project exists to **reuse what you have**: measure a pool of used buckets accurately, ignore the misleading side stamps, then pick and place the best 16 against real cold clearances. It is a scrap-yard and spare-engine problem turned into a small engineering workflow, because the supply chain for an obsolete car no longer covers the valvetrain.
 
-Two full sets (32 buckets) from a pair of engines, one of which had a head gasket failure, are the working stock.
+A single pool of **32** buckets (IDs A–AF) from a pair of engines — one of which had a head gasket failure — is the working stock.
 
 ## How wear happens
 
@@ -40,7 +40,7 @@ The matcher lives in `assign-buckets.ts` (`selectBestSixteen()`). It does **not*
 
 ### Inputs
 
-1. **Catalog pool** — every bucket with a pin reading (`cam-buckets.ts`). Keys are `set:letter` (e.g. `1:A`, `2:Q`).
+1. **Catalog pool** — every bucket with a pin reading (`cam-buckets.ts`). Keys are letter ids (`A` … `AF`).
 2. **Trial install** — any 16 buckets on the head, recorded per port.
 3. **Gap readings** — cold feeler clearance at each of the 16 ports (intake vs exhaust).
 
@@ -108,7 +108,7 @@ new thickness = installed thickness + (measured clearance − specified clearanc
 1. Catalog buckets (stamp + pin reading) in `cam-buckets.ts`
 2. Print / rebuild the measuring sleeve from `bucket-measure-sleeve.scad` (pin length **10.00 mm**, diameter ≈ valve stem)
 3. Centre thickness = pin reading − 10.00
-4. Install any 16, fit cams, measure cold gaps — note `set:letter` per port (`1:A`, `2:C`, …)
+4. Install any 16, fit cams, measure cold gaps — note letter id per port (`A`, `Q`, …)
 5. Run `selectBestSixteen()` to place the best 16 from the full pool; leftovers are spares
 
 ## Bucket report
@@ -133,6 +133,8 @@ Factory table uses **0.020 mm** steps:
 
 | File | Role |
 |------|------|
+| `AGENTS.md` | How agents should catalog, measure, and run the tool |
+| `src/` | Vite React UI (pool → gap pass → plan) |
 | `cam-buckets.ts` | Inventory, pin math, clearance constants |
 | `assign-buckets.ts` | Port map + `selectBestSixteen()` |
 | `bucket-measure-sleeve.scad` | 3D-printed guide; pin length 10 mm, diameter ≈ stem |
@@ -142,9 +144,19 @@ Factory table uses **0.020 mm** steps:
 
 ```bash
 npm install
+npm run dev          # web UI at http://localhost:5173
 npm run report:buckets
 npm test
+npm run build        # static site → dist/
 ```
+
+### Web UI
+
+Three steps in the browser:
+
+1. **Pool** — live view of `cam-buckets.ts` (edit the file or keep filling readings in chat, then refresh).
+2. **Gap pass** — pick the trial bucket and cold clearance for each of the 16 ports. Drafts save in localStorage.
+3. **Plan** — runs `selectBestSixteen()` and shows placement, predicted clearances, and spares.
 
 ## CI
 

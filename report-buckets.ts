@@ -1,13 +1,11 @@
 import {
-  allCamBuckets,
+  camBuckets,
   centreThicknessMm,
   factoryThicknessMm,
   wearFromBucket,
 } from "./cam-buckets.ts";
 
 type ReportRow = {
-  key: string;
-  set: number;
   id: string;
   stamped: number | null;
   pinReadingMm: number | null;
@@ -20,10 +18,8 @@ function formatMm(value: number | null): string {
   return value == null ? "-" : value.toFixed(2);
 }
 
-const rows: ReportRow[] = allCamBuckets
+const rows: ReportRow[] = camBuckets
   .map((bucket) => ({
-    key: `${bucket.set}:${bucket.id}`,
-    set: bucket.set,
     id: bucket.id,
     stamped: bucket.stamped,
     pinReadingMm: bucket.pinReadingMm,
@@ -32,10 +28,8 @@ const rows: ReportRow[] = allCamBuckets
     wearMm: wearFromBucket(bucket),
   }))
   .sort((a, b) => {
-    // Most negative (thinnest vs stamp) first
     const wearDiff = (a.wearMm ?? Infinity) - (b.wearMm ?? Infinity);
     if (Math.abs(wearDiff) > 1e-9) return wearDiff;
-    if (a.set !== b.set) return a.set - b.set;
     return a.id.localeCompare(b.id);
   });
 
@@ -57,7 +51,7 @@ console.log("");
 
 console.table(
   rows.map((row) => ({
-    key: row.key,
+    id: row.id,
     stamped: row.stamped ?? "-",
     pinReadingMm: formatMm(row.pinReadingMm),
     measuredMm: formatMm(row.measuredMm),
