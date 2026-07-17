@@ -1,22 +1,19 @@
-// Cam bucket measuring sleeve — M3 hex bolt guide
-// Daihatsu Copen cam buckets (shimless lifters)
+// Cam bucket measuring sleeve — stem-diameter pin guide
+// Daihatsu Copen / JB-DET shimless lifters
 //
-// As deep as the bolt allows, while leaving the hex head clear so the
-// micrometer spindle/anvil can reach it. Tip still protrudes onto the pad.
-//
-// Bolt bore is tight: friction-fit the shank, or print a tap drill and
-// run an M3 tap through for a screw-in fit.
-//
-// Longer bolt → deeper guide. Prefer M3x16 or M3x20 for more support.
+// Pin length 10.00 mm (subtract from micrometer reading).
+// Pin diameter matches the valve stem tip (~4.5 mm on JB-DET) so pad
+// contact matches the working footprint, not a sharp M3 point.
 //
 // Usage:
-//   1. Micrometer the bolt tip → top of hex head; write that length down.
-//   2. Print (PETG/ABS preferred; PLA ok for light use).
-//   3. If fit="tap", run an M3 tap through the bore.
-//   4. Push sleeve into the bucket; friction-push or screw the bolt tip-down.
-//   5. Micrometer: anvil on cam face, spindle on bolt head.
-//        bucket_thickness = reading - 10.00
-//   Measured pin length: 10.00 mm
+//   1. Confirm pin length tip → top; keep at 10.00 mm or update below.
+//   2. Print sleeve (PETG/ABS preferred).
+//   3. Drop pin tip-down onto the pad through the sleeve.
+//   4. Micrometer: anvil on cam face, spindle on pin top.
+//        bucket_thickness = reading - bolt_measured_length
+//
+// Legacy M3 hex-bolt parameters below still drive the printed guide;
+// update shank diameter if your stem-width pin needs a wider bore.
 
 /* [Bucket] */
 bucket_od = 23.5;          // measured
@@ -24,9 +21,11 @@ bucket_id = 20.5;          // OD - 2×1.5 mm wall
 bucket_clearance = -0.3;   // was 0.2; +0.5 mm OD for tighter fit (slight interference)
 cup_depth = 24.0;          // measured rim → pad
 
-/* [Bolt] */
+/* [Pin] */
+// JB-DET stem OD ≈ 4.46–4.48 mm (IN) / 4.455–4.47 mm (EX)
+pin_diameter = 4.5;        // match valve stem tip contact
 bolt_nominal = 16;         // [6, 8, 10, 12, 16, 18, 20] — longer = deeper sleeve
-bolt_shank_d = 3.0;
+bolt_shank_d = pin_diameter;
 bolt_head_af = 5.5;
 bolt_head_height = 3.1;    // approx; actual tip→top measured below
 bolt_measured_length = 10.00; // use this when subtracting from micrometer reading
@@ -37,11 +36,11 @@ head_pocket_depth = 4.0;
 
 /* [Bolt fit] */
 // "friction" = press/twist the plain shank in
-// "tap"      = 2.5 mm hole, then cut M3 thread with a tap (most repeatable)
+// "tap"      = legacy M3 tap path (not used with a stem-diameter pin)
 fit = "friction";          // [friction, tap]
-// Friction bore (mm). Start at 2.90; go 2.85 if loose, 2.95 if too tight
-friction_bore = 2.90;
-// Standard M3 tap drill
+// Friction bore (mm) — set just under pin_diameter for a snug slide
+friction_bore = 4.40;
+// Standard M3 tap drill (legacy)
 tap_drill = 2.50;
 
 /* [Sleeve] */
@@ -71,14 +70,14 @@ module measuring_sleeve() {
   lead_in = 0.4;
 
   assert(tube_od > tube_id + 1.2,
-    "bucket_id too small for M3 bore");
+    "bucket_id too small for pin bore");
   // tube_od may exceed bucket_id slightly for a press fit
   assert(insert_depth > 4,
-    "bolt too short — use a longer M3 or reduce head_protrusion");
+    "pin too short — lengthen pin or reduce head_protrusion");
   assert(head_protrusion >= 2.0,
-    "leave at least ~2–3 mm of head clear for the micrometer");
+    "leave at least ~2–3 mm of pin/head clear for the micrometer");
   assert(tube_id < bolt_shank_d,
-    "bore should be under M3 shank for friction/tap fit");
+    "bore should be under pin diameter for a snug fit");
 
   echo(str(
     "fit=", fit,

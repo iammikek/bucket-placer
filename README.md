@@ -24,15 +24,68 @@ The side stamp is the factory thickness code. Once the face has worn, that numbe
 
 ### Why the pin guide matters
 
-A flat micrometer alone is the wrong tool once the face is dished: the anvils sit on the rim and overstate thickness. The measuring sleeve (`bucket-measure-sleeve.scad`) drops into the bucket bore and holds a pin of known length (**10.00 mm**) so the tip finds the centre of the pad. Micrometer reading minus pin length is the centre thickness used for placement.
+A flat micrometer alone is the wrong tool once the face is dished: the anvils sit on the rim and overstate thickness. The measuring sleeve (`bucket-measure-sleeve.scad`) drops into the bucket bore and holds a pin of known length (**10.00 mm**) so the tip finds the pad centre. The pin diameter matches the **valve stem** (~4.5 mm on JB-DET), so contact on the pad is the same footprint the stem uses in the engine — not a sharp M3 point that can sit in a local pit. Micrometer reading minus pin length is the centre thickness used for placement.
 
-Without that, the catalogue would repeat the rim bias we saw on set 1 (many buckets looking ~3.4 mm on the rim while the centre sat near ~3.0 mm). The sleeve is a cheap fixture so every bucket is measured the same way.
+Without that, the catalogue would repeat the rim bias we saw early on (many buckets looking ~3.4 mm on the rim while the centre sat near ~3.0 mm). The sleeve is a cheap fixture so every bucket is measured the same way.
 
 Lapping or recutting valve seats recesses the valve into the head and **tightens** clearance. That often makes thinner worn buckets useful again after a valve job, instead of demanding thick new parts you cannot buy.
 
 ## What the tool does
 
 Records measured centre thickness for each bucket, then assigns the best 16 from a pool of up to 32 against cold intake/exhaust clearance targets.
+
+## How the matcher works
+
+The matcher lives in `assign-buckets.ts` (`selectBestSixteen()`). It does **not** use side stamps. It uses pin-measured centre thickness plus one cold gap pass on a trial set of 16.
+
+### Inputs
+
+1. **Catalog pool** — every bucket with a pin reading (`cam-buckets.ts`). Keys are `set:letter` (e.g. `1:A`, `2:Q`).
+2. **Trial install** — any 16 buckets on the head, recorded per port.
+3. **Gap readings** — cold feeler clearance at each of the 16 ports (intake vs exhaust).
+
+### Per-port ideal thickness
+
+For each port, Daihatsu’s formula gives the thickness that would put clearance on target:
+
+```text
+required thickness = installed thickness + (measured gap − target gap)
+```
+
+| Situation | Meaning | Need |
+|-----------|---------|------|
+| Gap too small | Clearance tight | Thinner bucket |
+| Gap too large | Clearance loose | Thicker bucket |
+
+Targets: intake **0.20 mm**, exhaust **0.30 mm**.
+
+### Choosing the best 16
+
+`selectBestSixteen()` fills ports with a **greedy best-fit**:
+
+1. Compute `required thickness` for every port from the trial gap pass.
+2. Repeatedly pick the unused bucket whose centre thickness is closest to some unfilled port’s required value (`|thickness − required|` smallest).
+3. Lock that pair, mark bucket and port used, repeat until all 16 ports are filled.
+4. The remaining catalog buckets are **spares**.
+
+For each assignment it also predicts clearance after the swap:
+
+```text
+predicted clearance = target + (required − chosen thickness)
+```
+
+and flags whether that sits in the allowed band (intake 0.17–0.25, exhaust 0.27–0.35).
+
+### Output
+
+- Bucket key per port (`1-IN-1`, `3-EX-2`, …)
+- Trial vs chosen thickness
+- Predicted clearance, error vs ideal, in-spec / out-of-spec
+- Spare list and a short summary (max / mean absolute error)
+
+So: **measure the pool once → trial gaps once → compute ideal thickness per valve → globally best-fit from up to 32**. You do not re-shuffle by hand.
+
+Slightly thicker-than-stamp readings are kept as-is: the matcher only cares about measured millimetres, not the factory mark.
 
 ## Cold valve clearance (JB-DET)
 
@@ -52,8 +105,8 @@ new thickness = installed thickness + (measured clearance − specified clearanc
 
 ## Workflow
 
-1. Catalog buckets (stamp, rim reading, pin reading) in `cam-buckets.ts`
-2. Print / rebuild the measuring sleeve from `bucket-measure-sleeve.scad` (pin length **10.00 mm**)
+1. Catalog buckets (stamp + pin reading) in `cam-buckets.ts`
+2. Print / rebuild the measuring sleeve from `bucket-measure-sleeve.scad` (pin length **10.00 mm**, diameter ≈ valve stem)
 3. Centre thickness = pin reading − 10.00
 4. Install any 16, fit cams, measure cold gaps — note `set:letter` per port (`1:A`, `2:C`, …)
 5. Run `selectBestSixteen()` to place the best 16 from the full pool; leftovers are spares
@@ -82,7 +135,7 @@ Factory table uses **0.020 mm** steps:
 |------|------|
 | `cam-buckets.ts` | Inventory, pin math, clearance constants |
 | `assign-buckets.ts` | Port map + `selectBestSixteen()` |
-| `bucket-measure-sleeve.scad` | 3D-printed M3 pin guide |
+| `bucket-measure-sleeve.scad` | 3D-printed guide; pin length 10 mm, diameter ≈ stem |
 | `tests/formula.test.ts` | Formula and assignment tests |
 
 ## Develop

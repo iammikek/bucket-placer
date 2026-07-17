@@ -20,6 +20,7 @@
  *   nominalMm = 2.48 + stamped * 0.02
  *
  * Measuring pin (rebuilt sleeve): thickness = pinReadingMm − 10.00
+ * Pin diameter matches JB-DET valve stem tip (~4.5 mm) for pad contact.
  */
 
 export type CamBucket = {
@@ -64,10 +65,13 @@ export const VALVE_CLEARANCE_COLD_MM = {
 } as const;
 
 /**
- * Measuring pin (rebuilt sleeve / known length).
+ * Measuring pin (rebuilt sleeve).
+ * Length 10.00 mm; diameter ≈ valve stem so pad contact matches the engine.
  * Thickness = micrometer reading − pin length.
  */
 export const MEASURE_PIN_LENGTH_MM = 10;
+/** Nominal pin / stem tip diameter used for pad contact (mm). */
+export const MEASURE_PIN_DIAMETER_MM = 4.5;
 
 /** Centre thickness from a pin-assisted micrometer reading. */
 export function thicknessFromReading(readingMm: number): number {
